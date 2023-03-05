@@ -1,8 +1,9 @@
 {
   "scripts": {
-    "start": "http-server public"
+    "start": "autoreload-server -d ./public -p 8080",
+    "deploy": "firebase deploy"
   },
   "dependencies": {
-    "firebase": "^8.10.1"
+    "firebase": "^9.17.1"
   }
 }
