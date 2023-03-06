@@ -10,8 +10,9 @@ import {
 import { 
 	getAuth, signInWithEmailAndPassword,
 	signOut, onAuthStateChanged,
+	createUserWithEmailAndPassword,
+	sendEmailVerification,
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
-
 
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
 
@@ -46,6 +47,7 @@ export function startFirebase(){
 	//console.log(db);
 }
 
+//USERS MANAGER
 export async function login(email,password){
 	const auth = getAuth();
 	return await new Promise(resolve=>{
@@ -94,6 +96,31 @@ export async function logout(){
 		});
 	});
 }
+
+export async function createUser(email, password){
+	const auth = getAuth();
+	return await new Promise(resolve=>{
+		createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
+			const user = userCredential.user;
+			current_user = user;
+			resolve(current_user);
+		})
+		.catch((error) => {
+			resolve(null);
+		});
+	});
+}
+
+export async function sendVerificationEmail(){
+	const auth = getAuth();
+	if(current_user){
+		await sendEmailVerification(current_user);
+		console.warn("SE ENVIO MAIL DE VERIFICACION A ",current_user.email);
+		return true;
+	}
+	return false;
+ }
+
 
 export function getUser(){
 	return current_user;
