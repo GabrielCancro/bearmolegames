@@ -16,6 +16,7 @@ import {
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
 
 var db;
+var current_user;
 
 export function startFirebase(){
 	console.log("startFirebase!");
@@ -41,7 +42,8 @@ export function startFirebase(){
 	const app = initializeApp(firebaseConfig);
 	const analytics = getAnalytics(app);
 	db = getFirestore();
-	console.log(db);
+	isLogued();
+	//console.log(db);
 }
 
 export async function login(email,password){
@@ -51,14 +53,16 @@ export async function login(email,password){
 		.then((userCredential) => {
 			// Signed in
 			const user = userCredential.user;
-			console.log("LOGUEO",user);
+			//console.log("LOGUEO",user);
+			current_user = user;
 			resolve(user);
 			// ...
 		})
 		.catch((error) => {
 			const errorCode = error.code;
 			const errorMessage = error.message;
-			console.log("ERROR DE LOGUEO!",errorMessage);
+			//console.log("ERROR DE LOGUEO!",errorMessage);
+			current_user = null;
 			resolve(null);
 		});
 	});	
@@ -68,8 +72,10 @@ export async function isLogued(){
 	const auth = getAuth();
 	return await new Promise(resolve=>{
 		onAuthStateChanged(auth, (user) => {
-			console.log("esta logueado",user);
-			resolve(user);
+			//console.log("esta logueado",user);
+			current_user = user;
+			if(user) resolve(true);
+			else resolve(false);
 		});
 	});
 }
@@ -78,13 +84,19 @@ export async function logout(){
 	const auth = getAuth();
 	return await new Promise(resolve=>{
 		signOut(auth).then(() => {
-			console.log("LOGOUT OK!");
+			//console.log("LOGOUT OK!");
+			current_user = null;
 			resolve(true);
 		}).catch((error) => {
-			console.log("LOGOUT ERROR",error);
+			//console.log("LOGOUT ERROR",error);
+			current_user = null;
 			resolve(false);
 		});
 	});
+}
+
+export function getUser(){
+	return current_user;
 }
 
 export async function writeFirebase(coll_name,data){

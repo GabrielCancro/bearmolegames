@@ -4,10 +4,11 @@ document.addEventListener('DOMContentLoaded', initApp);
 
 async function initApp(){
   fireutils.startFirebase();
-  changePage("login");
+  changePage("home");
 }
 
-function changePage(pageName){
-  console.log("CHANGE PAGE ",pageName);
-  $("#app").load("pages/"+pageName+".html");
+export async function changePage(pageName){
+	let logued = await fireutils.isLogued();
+	if( logued == false) pageName = "login";
+  	$("#app").load("pages/"+pageName+".html");
 }
