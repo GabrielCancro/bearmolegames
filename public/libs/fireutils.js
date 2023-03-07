@@ -121,8 +121,14 @@ export async function sendVerificationEmail(){
 	return false;
  }
 
-
 export function getUser(){
+	return current_user;
+}
+
+export async function refreshUser(){
+	const auth = getAuth();
+	await auth.currentUser.reload();
+	current_user = auth.currentUser;
 	return current_user;
 }
 
