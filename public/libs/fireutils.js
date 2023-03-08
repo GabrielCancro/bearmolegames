@@ -102,9 +102,14 @@ export async function createUser(email, password){
 export async function sendVerificationEmail(){
 	const auth = getAuth();
 	if(current_user){
-		await sendEmailVerification(current_user);
-		console.warn("SE ENVIO MAIL DE VERIFICACION A ",current_user.email);
-		return true;
+		try{
+			await sendEmailVerification(current_user);
+			console.warn("SE ENVIO MAIL DE VERIFICACION A ",current_user.email);
+			return true;
+		}catch(e){
+			console.warn("ERROR AL ENVIAR MAIL DE VERIFICACION ",e);
+			return false;
+		}
 	}
 	return false;
  }
