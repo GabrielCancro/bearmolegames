@@ -1,22 +1,13 @@
-//import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
-//from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js"
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-import { 
-	getFirestore, 
-	setDoc, getDocs, doc, getDoc, 
-	collection, query, where 
-} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
 import { 
 	getAuth, signInWithEmailAndPassword,
 	signOut, onAuthStateChanged,
 	createUserWithEmailAndPassword,
 	sendEmailVerification,
+	sendPasswordResetEmail,
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+//import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
 
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
-
-var db;
 var current_user;
 
 export function startFirebase(){
@@ -41,8 +32,8 @@ export function startFirebase(){
 		measurementId: "G-XDZT86HGJ7"
 	};
 	const app = initializeApp(firebaseConfig);
-	const analytics = getAnalytics(app);
-	db = getFirestore();
+	//const analytics = getAnalytics(app);
+	//db = getFirestore();
 	isLogued();
 	//console.log(db);
 }
@@ -57,15 +48,12 @@ export async function login(email,password){
 			const user = userCredential.user;
 			//console.log("LOGUEO",user);
 			current_user = user;
-			resolve(user);
+			resolve({success:true,user:user});
 			// ...
 		})
 		.catch((error) => {
-			const errorCode = error.code;
-			const errorMessage = error.message;
-			//console.log("ERROR DE LOGUEO!",errorMessage);
 			current_user = null;
-			resolve(null);
+			resolve({success:false,error:error.code});
 		});
 	});	
 }
@@ -103,10 +91,10 @@ export async function createUser(email, password){
 		createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
 			const user = userCredential.user;
 			current_user = user;
-			resolve(current_user);
+			resolve({success:true,user:current_user});
 		})
 		.catch((error) => {
-			resolve(null);
+			resolve({success:false,error:error.code});
 		});
 	});
 }
@@ -121,6 +109,13 @@ export async function sendVerificationEmail(){
 	return false;
  }
 
+export async function sendRestorePasswordEmail(email){
+	const auth = getAuth();
+	var res = await sendPasswordResetEmail(auth, email)
+	console.log("SendRestorePasswordEmail->",res);
+	return res;
+ }
+
 export function getUser(){
 	return current_user;
 }
@@ -130,66 +125,4 @@ export async function refreshUser(){
 	await auth.currentUser.reload();
 	current_user = auth.currentUser;
 	return current_user;
-}
-
-export async function writeFirebase(coll_name,data){
-	if (!data.id){
-		console.log("ERROR: Falta el campo <id> en ",data);
-		return
-	}
-	try {
-	  const docRef = await setDoc(doc(db, coll_name, data.id), data);
-	  console.log("Document written with ID: ", data.id);
-	} catch (e) {
-	  console.error("Error adding document: ", e);
-	}
-}
-
-export async function readFirebase(coll_name,id=null){
-	try {
-		if(!id){
-			const querySnapshot = await getDocs(collection(db, coll_name));
-			querySnapshot.forEach((doc) => {
-			  console.log(doc.id,"=>",doc.data());
-			});
-			return _docsToObject(querySnapshot);
-		}else{
-			const docRef = doc(db, coll_name, id);
-			const docSnap = await getDoc(docRef);
-			if (docSnap.exists()) {
-			  console.log("Document data:", docSnap.data());
-			  return _docsToObject(docSnap);
-			} else {
-			  // doc.data() will be undefined in this case
-			  console.log("No such document!");
-			}
-		}	
-		return null;		
-	} catch (error) {
-		console.warn("@@@@ERROR",error);
-		return null;
-	}	
-}
-
-export async function readWhereFirebase(coll_name,paramA,opp,paramB){
-	try {
-		const querry = query(collection(db, coll_name), where(paramA, opp, paramB));
-		const querySnapshot = await getDocs(querry);
-		querySnapshot.forEach((doc) => {
-		console.log(doc.id, " => ", doc.data());
-		return _docsToObject(querySnapshot);
-		});
-	} catch (error) {
-		console.warn("@@@@ERROR",error);
-		return null;
-	}		
-	
-}
-
-function _docsToObject(docs){
-	var result = {};
-	docs.forEach((doc) => {
-		result[doc.id] = doc.data();
-	});
-	return result;
 }
