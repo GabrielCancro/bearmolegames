@@ -45,7 +45,7 @@ async function check_username(username){
     }
     $("#tx_error").html("Comprobando...");
     var users = await fdb.read_db("users");
-    if(users[username]){
+    if(users && users[username]){
         $("#tx_error").html("Ese nombre de usuario ya existe.");
         return false;
     }
