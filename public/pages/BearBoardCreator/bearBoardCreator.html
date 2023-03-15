@@ -1,0 +1,36 @@
+<div id="design_work_space">
+    <div id="card_space">
+        <div class="node n1"></div>
+        <div class="node n2"></div>
+    </div>
+</div>
+<style>
+    body{
+        background-color: #555;
+    }
+    #design_work_space{
+        position: absolute;
+        overflow: hidden;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+        background-color: black;
+    }
+    #card_space {
+        display: inline-block;        
+        background-color: white;
+        width: 100%;
+        height: 100%;
+        box-shadow: 0px 0px 0px 2px #000; 
+        
+    }
+    #card_space .node{
+        //box-shadow: 0px 0px 0px 1px #555;
+    }
+    #card_space .node:hover{
+        z-index: 99999;
+        opacity: .9;
+        box-shadow: 0px 0px 0px 2px black;
+        
+    }
+</style>
