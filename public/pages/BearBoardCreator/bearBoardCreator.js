@@ -4,12 +4,14 @@ export async function initPage(){
     updateCard();
 }
 
+var CURRENT_NODE_ID = -1;
+
 function updateCard(){
     var rootElement = $('#card_space')
     rootElement.css('width',cardData.size_x);
     rootElement.css('height',cardData.size_y);
     $('#card_space').html('');
-    for(var nodeData of cardData.nodes) create_node(nodeData)
+    for(var id in cardData.nodes) create_node(id);
     $("#btn_save").click(()=>{
         saveFile(cardData,"nodesData.json");
     });
@@ -18,15 +20,27 @@ function updateCard(){
         if(data) cardData = data;
         updateCard();
     });
+    $('#design_edit_panel').on('keyup', function (e) {
+        $("#btn_apply").html('*APPLY*');
+    });
+    $("#btn_apply").click(async ()=>{
+        try{
+            var data = JSON.parse( $('#design_edit_panel').html() );
+            cardData.nodes[CURRENT_NODE_ID] = data;
+            updateCard();
+            $("#btn_apply").html('APPLY');
+        }catch(e){
+            console.log(e);
+            $("#btn_apply").html('ERROR');            
+        }        
+    });    
 }
 
 var nodeId = 0;
-function create_node(n){
-    console.log("create_node ",n)
-    nodeId += 1;
-    if(!n.name) n.name = 'cardnode'+nodeId;
-    var child = $('<div id="'+n.name+'"/>');
-    n.id = 'cardnode'+nodeId;
+function create_node(id){
+    var n = cardData.nodes[id];
+    n.id = id;
+    var child = $('<div id="'+n.id+'"/>');
     if(n.type=="text"){
         child.addClass('node')
         .css('width',n.w)
@@ -36,26 +50,28 @@ function create_node(n){
     }
     if(n.parent) $('#'+n.parent).append(child);
     else $('#card_space').append(child);
-    $('.node').click(select_node);
+    child.click(select_node);
 }
 
-function select_node(nodeElement){
-    console.log(nodeElement);
+function select_node(e){
+    let id = $(e.target).attr('id');
+    CURRENT_NODE_ID = id;
+    console.log(cardData.nodes[id]);
+    $('#design_edit_panel').html( JSON.stringify(cardData.nodes[id],null,2) );
 }
 
 var cardData = {
     size_x:"6cm",
     size_y:"10cm",
-    nodes: [
-        {type:'text',w:'2cm',h:'2cm',tx:'Hola Amigo!',style:{backgroundColor:"blue"} },
-        {name: "c1", type:'text',w:'100%',h:'2cm',tx:'Hola Amigo!',style:{backgroundColor:"yellow",padding:'.2cm'} },
-        //{parent: "c1", type:'text',w:'50%',h:'2cm',tx:'sss',style:{backgroundColor:"Brawn"} },
-        
-        {type:'text',w:'100%',h:'5.6cm',tx:'',style:{
+    nodes: {
+        n1:{type:'text',w:'2cm',h:'2cm',tx:'Hola Amigo!',style:{backgroundColor:"blue"} },
+        n2:{type:'text',w:'100%',h:'2cm',tx:'Hola Amigo!',style:{backgroundColor:"yellow",padding:'.2cm'} },
+        //n3:{parent: "c1", type:'text',w:'50%',h:'2cm',tx:'sss',style:{backgroundColor:"Brawn"} },
+        n4:{type:'text',w:'100%',h:'5.6cm',tx:'',style:{
             background:'red  url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKQV9WKkVv6rzdewQFCVj09zGHAvq5hpZzyeWFtjTWu4opj7knKshsQD6VZkmLoQb7rr0&usqp=CAU") no-repeat center',
             backgroundSize:'100% 100%',
         } },
-    ]
+    }
 }
 
 function saveFile(data, filename){
