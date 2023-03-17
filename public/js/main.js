@@ -19,7 +19,7 @@ var pagesRef = {
 
 
 document.addEventListener('DOMContentLoaded', initApp);
-const no_require_auth = ["login","newAccount","resetPassword","bearBoardCreator"];
+const no_require_auth = ["login","newAccount","resetPassword"];
 async function initApp(){
   	fireutils.startFirebase();
 

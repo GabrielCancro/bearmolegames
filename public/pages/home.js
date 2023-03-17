@@ -11,6 +11,10 @@ export async function initPage(){
         await fireutils.logout();  
         main.changePage("login");      
     });
+    $("#btn_bbc").click(()=>{
+    	main.changePage("bearBoardCreator"); 
+    });
+    
 }
 
 async function get_user_info(){

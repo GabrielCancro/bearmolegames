@@ -25,15 +25,25 @@ function updateCard(){
     });
     $("#btn_apply").click(async ()=>{
         try{
-            var data = JSON.parse( $('#design_edit_panel').html() );
+            var data = get_json_from_pre("design_edit_panel");
             cardData.nodes[CURRENT_NODE_ID] = data;
             updateCard();
             $("#btn_apply").html('APPLY');
         }catch(e){
+            //get_json_from_pre("design_edit_panel");
             console.log(e);
             $("#btn_apply").html('ERROR');            
         }        
     });    
+}
+
+function get_json_from_pre(idElem){
+    var str = $('#'+idElem).html();
+    str = str.replaceAll("<div>","");
+    str = str.replaceAll("</div>","");
+    str = str.replaceAll("<br>","");
+    console.log("@@@"+str);
+    return JSON.parse(str);
 }
 
 var nodeId = 0;
