@@ -1,0 +1,89 @@
+body{
+    background-color: black;
+}
+#design_header{        
+    width: 100%;
+    height: 2em;
+    background-color: black;
+}
+.ds_btn {
+    display: inline-block;
+    background-color: #A9A9F9;
+    line-height: 2em;
+    padding: 0 1em;
+    user-select: none;
+}
+.ds_btn:hover {
+    background-color: #D9D9F9;
+}
+.ds_card_selector{
+    display: inline-block;
+    background-color: #A9A9F9;
+    line-height: 2em;
+    user-select: none;
+}
+.ds_card_selector .ds_btn{ 
+    text-align: center; 
+    min-width: 1em;
+}
+#slc_projects {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+#design_body{
+    display: flex;
+    align-items: center; 
+    background-color: #555;
+    width: 100%;
+    height: 70vh;
+}
+#design_body #design_work_space{
+    display: flex;
+    align-items: center;
+    background-color: #909090;
+    width: 50%;
+    height: 100%;
+}
+#design_body #design_work_space #card_space {
+    margin:auto;
+    background-color: white;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0px 0px 0px 2px #000; 
+    transform: scale(1);
+}
+#design_body #design_work_space #card_space .node{
+    /*box-shadow: 0px 0px 0px 1px #555;*/
+}
+#design_body #design_work_space #card_space .node:hover{
+    z-index: 99999;
+    opacity: .9;
+    box-shadow: 0px 0px 0px 2px black;
+}
+#design_body #design_edit_panel{
+    display: inline-block;
+    background-color: #F0A0A0;
+    padding: 0 2.5%;
+    width: 45%;
+    height: 100%;
+}
+#json_editor{
+    background-color: #A0A0A0;
+    padding: 1em;
+    box-shadow: 0px 0px 0px 2px black;
+    border-radius: .2em;
+    min-height: 5em;
+}
+#json_editor2{
+    background-color: #A0A0A0;
+    padding: 1em;
+    box-shadow: 0px 0px 0px 2px black;
+    border-radius: .2em;
+    min-height: 5em;
+}
+#json_editor2 input{
+    width: 45%;
+}
+.hidden{ display: none !important;}

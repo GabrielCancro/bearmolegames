@@ -1,15 +1,19 @@
 import * as fireutils from "../../libs/fireutils.js";
 import * as fdb from "../../libs/firebase_realtime_basedata.js";
+import JsonEditor from "./components/JsonEditor.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 export async function initPage(){ 
 	console.log("BEAR BOARD!");
     console.log("CURRENT USER",fireutils.getUser());
+    $('<link>').appendTo('head').attr({type: 'text/css', rel: 'stylesheet',href: 'pages/BearBoardCreator/styles.css'});
+    EDITOR_JSON = new JsonEditor("json_editor2"); 
     loadProjectsList();
     set_header_actions();
     updateCard();
 }
 
+var EDITOR_JSON;
 var CURRENT_NODE_ID = null;
 var CURRENT_CARD_INDEX = 1;
 var CURRENT_MODE = "DESIGN"; // DESIGN-CARDS
@@ -34,9 +38,8 @@ async function set_header_actions(){
             return;
         }
         try{
-            var data = get_json_from_pre("json_editor");
-            if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID].style = data;
-            if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = data;
+            if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID].style = EDITOR_JSON.getData();
+            if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
             updateCard(false);
             $("#btn_apply").html('APPLY');
         }catch(e){
@@ -147,9 +150,10 @@ function select_node(e){
         return;
     }
     CURRENT_NODE_ID = id;
-    $('#btn_node_id').html(CURRENT_NODE_ID);
+    $('#btn_node_id').html(CURRENT_NODE_ID);    
     if( CURRENT_MODE=="DESIGN" ){
         $('#json_editor').html( JSON.stringify(cardData.nodes[id].style,null,2) );
+        EDITOR_JSON.select(cardData.nodes[id].style);
     }else if(cardData.cards['c'+CURRENT_CARD_INDEX]){
         if(cardData.cards['c'+CURRENT_CARD_INDEX][id] ){
             $('#json_editor').html( JSON.stringify(cardData.cards['c'+CURRENT_CARD_INDEX][id],null,2) );
@@ -161,6 +165,7 @@ function deselect_node(){
     CURRENT_NODE_ID = -1;
     $('#json_editor').html('');
     $('#btn_node_id').html('-');
+    EDITOR_JSON.deselect();
 }
 
 var cardData = {
