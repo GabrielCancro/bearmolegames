@@ -4,7 +4,16 @@
         <select class="ds_btn" id="slc_projects">...</select>
         <div id="btn_save" class="ds_btn">SAVE</div>
         <div id="btn_load" class="ds_btn">LOAD</div>
+
+        <div id="card_selector" class="ds_card_selector">
+            <div id="btn_back_card" class="ds_btn hidden">&#60;</div>
+            <div id="btn_mode_card" class="ds_btn">DESIGN</div>
+            <div id="btn_next_card" class="ds_btn hidden">&#62;</div>
+        </div>
+
         <div id="btn_apply" class="ds_btn">APPLY</div>
+        <div id="btn_node_id" class="ds_btn">-</div>
+        
     </div>
     <div id="design_body">
         <div id="design_work_space">
@@ -13,7 +22,10 @@
                 <div class="node n2"></div>
             </div>
         </div>
-        <pre id="design_edit_panel" contenteditable="true">
+        <div id="design_edit_panel">
+            <h3>EDITOR DE NODOS</h3>
+            <pre id="json_editor" contenteditable="true">
+        </div>
         </pre>
     </div>
 </div>
@@ -35,6 +47,16 @@
     }
     .ds_btn:hover {
         background-color: #D9D9F9;
+    }
+    .ds_card_selector{
+        display: inline-block;
+        background-color: #A9A9F9;
+        line-height: 2em;
+        user-select: none;
+    }
+    .ds_card_selector .ds_btn{ 
+        text-align: center; 
+        min-width: 1em;
     }
     #slc_projects {
         height: 100%;
@@ -75,7 +97,16 @@
     #design_body #design_edit_panel{
         display: inline-block;
         background-color: #F0A0A0;
-        width: 50%;
+        padding: 0 2.5%;
+        width: 45%;
         height: 100%;
     }
+    #json_editor{
+        background-color: #A0A0A0;
+        padding: 1em;
+        box-shadow: 0px 0px 0px 2px black;
+        border-radius: .2em;
+        min-height: 5em;
+    }
+    .hidden{ display: none !important;}
 </style>
