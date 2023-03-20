@@ -84,6 +84,7 @@ async function set_header_actions(){
     }); 
     
 }
+
 async function loadProjectsList(){
     var slcElem = $("#slc_projects").html("<option disabled selected value> -- select an option -- </option>");
     var save_mail = fireutils.getUser().email.replace("@","_").replace(".","_");
@@ -141,7 +142,6 @@ function create_node(id){
         child.html(cardData.cards['c'+CURRENT_CARD_INDEX][id].content);
     } 
 }
-
 
 function select_node(e){
     let id = $(e.target).attr('id');

@@ -7,6 +7,7 @@ import * as verificationPage from "../pages/verification.js";
 import * as resetPasswordPage from "../pages/resetPassword.js";
 
 import * as bearBoardCreator from "../pages/BearBoardCreator/bearBoardCreator.js";
+import * as bbcProjectsPage from "../pages/BearBoardCreator/bbcProjects.js";
 
 var pagesRef = {
 	login: loginPage,
@@ -15,6 +16,7 @@ var pagesRef = {
 	verification: verificationPage,
 	resetPassword: resetPasswordPage,
 	bearBoardCreator: bearBoardCreator,
+	bbcProjects: bbcProjectsPage,
 }
 
 
