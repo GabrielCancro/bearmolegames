@@ -4,13 +4,12 @@ import JsonEditor from "./components/JsonEditor.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 export async function initPage(){ 
-	console.log("BEAR BOARD!");
-    console.log("CURRENT USER",fireutils.getUser());
     $('<link>').appendTo('head').attr({type: 'text/css', rel: 'stylesheet',href: 'pages/BearBoardCreator/styles.css'});
-    EDITOR_JSON = new JsonEditor("json_editor2"); 
-    loadProjectsList();
+    EDITOR_JSON = new JsonEditor("json_editor"); 
+    if(!window.CURRENT_BBC_PROJECT_SELECTED) window.CURRENT_BBC_PROJECT_SELECTED = "testProject01";
+    await loadFile(window.CURRENT_BBC_PROJECT_SELECTED);
+    loadCardList();
     set_header_actions();
-    updateCard();
 }
 
 var EDITOR_JSON;
@@ -19,18 +18,14 @@ var CURRENT_CARD_INDEX = 1;
 var CURRENT_MODE = "DESIGN"; // DESIGN-CARDS
 
 async function set_header_actions(){
-    
-    $("#btn_project").html(cardData.projectName);
+
     $("#btn_save").click(()=>{
         saveFile(cardData,"nodesData.json");
     });
     $("#btn_load").click(()=>{
         loadFile(cardData.projectName);
         
-    });
-    $('#json_editor').on('keyup', function (e) {
-        $("#btn_apply").html('*APPLY*');
-    });
+    });    
     $("#btn_apply").click(async ()=>{
         console.log("CARD DATA",cardData);
         if(!CURRENT_NODE_ID){
@@ -42,61 +37,31 @@ async function set_header_actions(){
             if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
             updateCard(false);
             $("#btn_apply").html('APPLY');
+            reselect_node();
         }catch(e){
             console.log(e);
             $("#btn_apply").html('ERROR');            
         }        
-    });   
-    $("#btn_back_card").click(()=>{
-        var size = Object.keys(cardData.cards).length;
-        if(CURRENT_MODE=="CARDS" && CURRENT_CARD_INDEX>1){
-            CURRENT_CARD_INDEX -= 1;
-            updateCard();
-        }  
-        if(CURRENT_MODE=="CARDS") $("#btn_mode_card").html(CURRENT_CARD_INDEX+' / '+size);
-        else $("#btn_mode_card").html("DESIGN");     
     });
-    $("#btn_next_card").click(()=>{
-        var size = Object.keys(cardData.cards).length;
-        if(CURRENT_MODE=="CARDS" && CURRENT_CARD_INDEX<size){
-            CURRENT_CARD_INDEX += 1;
-            updateCard();
-        }     
-        if(CURRENT_MODE=="CARDS") $("#btn_mode_card").html(CURRENT_CARD_INDEX+' / '+size);
-        else $("#btn_mode_card").html("DESIGN");
-    });  
-    $("#btn_mode_card").click(()=>{
-        var size = Object.keys(cardData.cards).length;
-        if(CURRENT_MODE=="CARDS") CURRENT_MODE="DESIGN";
-        else if(CURRENT_MODE=="DESIGN") CURRENT_MODE="CARDS";
-        updateCard();
-        console.log(CURRENT_MODE);
-        if(CURRENT_MODE=="CARDS"){
-            $("#btn_next_card").removeClass('hidden');
-            $("#btn_back_card").removeClass('hidden');
-            $("#btn_mode_card").html(CURRENT_CARD_INDEX+' / '+size);
-        }else{
-            $("#btn_next_card").addClass('hidden');
-            $("#btn_back_card").addClass('hidden');
-            $("#btn_mode_card").html("DESIGN");
-        } 
-        deselect_node();
-    }); 
     
 }
 
-async function loadProjectsList(){
-    var slcElem = $("#slc_projects").html("<option disabled selected value> -- select an option -- </option>");
-    var save_mail = fireutils.getUser().email.replace("@","_").replace(".","_");
-    var data = await fdb.read_db("bear_board_creator/"+save_mail+"/projects");
-    for(var projectName in data){
-        slcElem.append( $('<option value="'+projectName+'">'+projectName+'</option>') );  
+async function loadCardList(){
+    var slcElem = $("#slc_cards").html('<option selected value="DESIGN"> - DISEÑO - </option>');
+    var index = 0
+    for(var card in cardData.cards){
+        index += 1;
+        slcElem.append( $('<option value="'+index+'">'+card+'</option>') );  
     }
     slcElem.change( async (e)=>{         
         var opt = slcElem.find("option:selected");
-        console.log( opt.val() );
-        loadFile( opt.val() );
-        //$('#card_space').html('')
+        if (opt.val()=="DESIGN"){
+            CURRENT_MODE="DESIGN"
+        }else{
+            CURRENT_MODE="CARDS"
+            CURRENT_CARD_INDEX = opt.val();
+        }
+        updateCard();
     });
 }
 
@@ -152,41 +117,23 @@ function select_node(e){
     CURRENT_NODE_ID = id;
     $('#btn_node_id').html(CURRENT_NODE_ID);    
     if( CURRENT_MODE=="DESIGN" ){
-        $('#json_editor').html( JSON.stringify(cardData.nodes[id].style,null,2) );
         EDITOR_JSON.select(cardData.nodes[id].style);
     }else if(cardData.cards['c'+CURRENT_CARD_INDEX]){
         if(cardData.cards['c'+CURRENT_CARD_INDEX][id] ){
-            $('#json_editor').html( JSON.stringify(cardData.cards['c'+CURRENT_CARD_INDEX][id],null,2) );
-        } else $('#json_editor').html( JSON.stringify({},null,2) );
-    } else $('#json_editor').html( JSON.stringify({},null,2) );    
+            EDITOR_JSON.select(cardData.cards['c'+CURRENT_CARD_INDEX][id]);
+        } else EDITOR_JSON.deselect();
+    } else EDITOR_JSON.deselect();  
+}
+
+function reselect_node(){
+    var aux_id = CURRENT_NODE_ID;
+    CURRENT_NODE_ID = null;
+    select_node( {target:$("#"+aux_id)} );
 }
 
 function deselect_node(){
     CURRENT_NODE_ID = -1;
-    $('#json_editor').html('');
-    $('#btn_node_id').html('-');
     EDITOR_JSON.deselect();
-}
-
-var cardData = {
-    projectName: "defaultProject",
-    size_x:"6cm",
-    size_y:"10cm",
-    nodes: {
-        n1:{type:'text',w:'2cm',h:'2cm',style:{backgroundColor:"blue",content: 'Hola Amigo!'} },
-        n2:{type:'text',w:'100%',h:'2cm',style:{backgroundColor:"yellow",padding:'.2cm',content: 'Hola Amigo!'} },
-        //n3:{parent: "c1", type:'text',w:'50%',h:'2cm',tx:'sss',style:{backgroundColor:"Brawn"} },
-        n4:{type:'text',w:'100%',h:'5.6cm',style:{
-            background:'red  url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKQV9WKkVv6rzdewQFCVj09zGHAvq5hpZzyeWFtjTWu4opj7knKshsQD6VZkmLoQb7rr0&usqp=CAU") no-repeat center',
-            backgroundSize:'100% 100%',
-        } },
-    },
-    cards:{
-        c1:{ n1:{backgroundColor:"red"} },
-        c2:{},
-        c3:{},
-        c4:{},
-    }
 }
 
 function saveFile(data, filename){
@@ -214,5 +161,27 @@ async function loadFile(projectName){
     var data = await fdb.read_db("bear_board_creator/"+save_mail+"/projects/"+projectName);
     if(data) cardData = data;
     if(!cardData.cards) cardData['cards']= { c1:{},c2:{} };
+    $("#btn_project").html(cardData.projectName);
     updateCard();
+}
+
+var cardData = {
+    projectName: "defaultProject",
+    size_x:"6cm",
+    size_y:"10cm",
+    nodes: {
+        n1:{type:'text',w:'2cm',h:'2cm',style:{backgroundColor:"blue",content: 'Hola Amigo!'} },
+        n2:{type:'text',w:'100%',h:'2cm',style:{backgroundColor:"yellow",padding:'.2cm',content: 'Hola Amigo!'} },
+        //n3:{parent: "c1", type:'text',w:'50%',h:'2cm',tx:'sss',style:{backgroundColor:"Brawn"} },
+        n4:{type:'text',w:'100%',h:'5.6cm',style:{
+            background:'red  url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKQV9WKkVv6rzdewQFCVj09zGHAvq5hpZzyeWFtjTWu4opj7knKshsQD6VZkmLoQb7rr0&usqp=CAU") no-repeat center',
+            backgroundSize:'100% 100%',
+        } },
+    },
+    cards:{
+        c1:{ n1:{backgroundColor:"red"} },
+        c2:{},
+        c3:{},
+        c4:{},
+    }
 }
