@@ -1,6 +1,8 @@
 import * as fireutils from "../../libs/fireutils.js";
 import * as fdb from "../../libs/firebase_realtime_basedata.js";
 import JsonEditor from "./components/JsonEditor.js";
+import * as fontLoader from "./components/FontLoader.js";
+
 
 export var pageRoot = "pages/BearBoardCreator";
 export async function initPage(){ 
@@ -10,6 +12,7 @@ export async function initPage(){
     await loadFile(window.CURRENT_BBC_PROJECT_SELECTED);
     loadCardList();
     set_header_actions();
+    fontLoader.loadAllFonts();
 }
 
 var EDITOR_JSON;
@@ -21,6 +24,7 @@ async function set_header_actions(){
 
     $("#btn_save").click(()=>{
         saveFile(cardData,"nodesData.json");
+        recalculateCardScale();
     });
     $("#btn_load").click(()=>{
         loadFile(cardData.projectName);
@@ -42,21 +46,29 @@ async function set_header_actions(){
             console.log(e);
             $("#btn_apply").html('ERROR');            
         }        
-    });
-    
+    });    
 }
 
 async function loadCardList(){
-    var slcElem = $("#slc_cards").html('<option selected value="DESIGN"> - DISEÑO - </option>');
+    var slcElem = $("#slc_cards").html('<option selected value="DESIGN"> # DISEÑO # </option>');
     var index = 0
     for(var card in cardData.cards){
         index += 1;
-        slcElem.append( $('<option value="'+index+'">'+card+'</option>') );  
+        let cardName = card;
+        if(cardData.cards[card].cardName) cardName = cardData.cards[card].cardName;        
+        slcElem.append( $('<option value="'+index+'">'+cardName+'</option>') );  
     }
+    slcElem.append( $('<option value="ADD">+AGREGAR+</option>') ); 
     slcElem.change( async (e)=>{         
         var opt = slcElem.find("option:selected");
         if (opt.val()=="DESIGN"){
             CURRENT_MODE="DESIGN"
+        }else if (opt.val()=="ADD"){
+            let size = Object.keys(cardData.cards).length;
+            let newId = "c"+(size+1);
+            cardData.cards[newId] = {cardName:"card_"+(size+1)};
+            loadCardList();
+            slcElem.val(size+1);
         }else{
             CURRENT_MODE="CARDS"
             CURRENT_CARD_INDEX = opt.val();
@@ -72,6 +84,15 @@ function updateCard(deselectNodes = true){
     rootElement.css('height',cardData.size_y);
     $('#card_space').html('');  
     for(var id in cardData.nodes) create_node(id);
+    recalculateCardScale();
+}
+
+function recalculateCardScale(){
+    var scale = 1;
+    var sw = .9*$('#design_work_space').width()/$('#card_space').width();
+    var sh = .9*$('#design_work_space').height()/$('#card_space').height();
+    var scale = Math.min(sw,sh);
+    $('#card_space').css('transform','translate(-50%,-50%) scale('+scale+')');
 }
 
 function get_json_from_pre(idElem){
@@ -121,7 +142,7 @@ function select_node(e){
     }else if(cardData.cards['c'+CURRENT_CARD_INDEX]){
         if(cardData.cards['c'+CURRENT_CARD_INDEX][id] ){
             EDITOR_JSON.select(cardData.cards['c'+CURRENT_CARD_INDEX][id]);
-        } else EDITOR_JSON.deselect();
+        } else EDITOR_JSON.select({});
     } else EDITOR_JSON.deselect();  
 }
 
