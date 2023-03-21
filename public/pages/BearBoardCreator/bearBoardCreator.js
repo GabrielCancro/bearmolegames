@@ -2,7 +2,7 @@ import * as fireutils from "../../libs/fireutils.js";
 import * as fdb from "../../libs/firebase_realtime_basedata.js";
 import JsonEditor from "./components/JsonEditor.js";
 import * as fontLoader from "./components/FontLoader.js";
-
+import * as main from "/js/main.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 export async function initPage(){ 
@@ -21,7 +21,9 @@ var CURRENT_CARD_INDEX = 1;
 var CURRENT_MODE = "DESIGN"; // DESIGN-CARDS
 
 async function set_header_actions(){
-
+    $("#btn_project").click(()=>{
+        main.changePage("bbcProjects");
+    });
     $("#btn_save").click(()=>{
         saveFile(cardData,"nodesData.json");
         recalculateCardScale();
@@ -47,6 +49,9 @@ async function set_header_actions(){
             $("#btn_apply").html('ERROR');            
         }        
     });    
+    $("#btn_print").click(async ()=>{
+        main.changePage("printCards");
+    });   
 }
 
 async function loadCardList(){

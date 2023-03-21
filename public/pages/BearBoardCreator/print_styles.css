@@ -1,0 +1,13 @@
+#print_work_space{
+    display: inline-block;
+}
+.card_print{
+    display: inline-block;
+    overflow: hidden;
+    border: 1px solid black;
+    margin: 0.1cm;
+}
+@media print {
+	body {-webkit-print-color-adjust: exact;}
+	.ds_btn{display: none;}
+}
