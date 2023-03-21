@@ -1,6 +1,4 @@
-json_editorbody{
-    background-color: black;
-}
+body{border:none !important;}
 #design_header{        
     width: 100%;
     height: 2em;
