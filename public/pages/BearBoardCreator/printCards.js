@@ -11,7 +11,7 @@ export async function initPage(){
     //$('<link>').appendTo('head').attr({type: 'application/javascript',href: 'pages/BearBoardCreator/components/html2pdf.bundle.min'}); 
     await loadFile(window.CURRENT_BBC_PROJECT_SELECTED);
     $("#btn_print").click(async ()=>{
-        print('print_work_space');
+        print('print_paper');
     }); 
 
 }
