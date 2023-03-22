@@ -14,8 +14,8 @@ export function createCard(_cardData,index=0){
 function create_node(div,id){
     var data = cardData.nodes[id];
     data.id = id;
-    var child = $('<div id="'+data.id+'"/>');
-    apply_css(child,data.style)
+    var child = $('<div id="'+data.id+'" class="node"/>');
+    apply_css(child,data);
     if(data.parent) $('#'+data.parent).append(child);
     else div.append(child);
     //CARDS OVERRIDES

@@ -40,7 +40,13 @@ body{border:none !important;}
     width: 50%;
     height: 100%;
 }
-#design_body #design_work_space #card_space {
+
+#btn_add_node{
+    position:absolute;
+    top:3em;
+    left:1em;
+}
+#card_space {
     position: relative;
     top: 50%;
     left: 50%;
@@ -51,15 +57,19 @@ body{border:none !important;}
     box-shadow: 0px 0px 0px 2px #000; 
     
 }
-#design_body #design_work_space #card_space .node .selected{
+
+#card_space .node{
+    user-select: none;
+}
+#card_space .node.selected{
     z-index: 99999;
     opacity: .9;
     box-shadow: 0px 0px 0px 2px #7070F0;
 }
-#design_body #design_work_space #card_space .node:hover{
+#card_space .node:hover{
     z-index: 99999;
     opacity: .9;
-    box-shadow: 0px 0px 0px 2px black;
+    box-shadow: 0px 0px 0px 2px yellow;
 }
 #design_body #design_edit_panel{
     display: inline-block;

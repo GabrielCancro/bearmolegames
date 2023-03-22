@@ -3,10 +3,11 @@ import * as fdb from "../../libs/firebase_realtime_basedata.js";
 import JsonEditor from "./components/JsonEditor.js";
 import * as fontLoader from "./components/FontLoader.js";
 import * as main from "/js/main.js";
-import * as cardGen from "./components/cardGenerator.js";
+import * as cardGen from "./components/CardGenerator.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 export async function initPage(){ 
+    console.log("https://sites.google.com/view/usefulweb-devtips/home");
     $('<link>').appendTo('head').attr({type: 'text/css', rel: 'stylesheet',href: 'pages/BearBoardCreator/styles.css'});
     EDITOR_JSON = new JsonEditor("json_editor"); 
     if(!window.CURRENT_BBC_PROJECT_SELECTED) window.CURRENT_BBC_PROJECT_SELECTED = "testProject01";
@@ -40,7 +41,7 @@ async function set_header_actions(){
             return;
         }
         try{
-            if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID].style = EDITOR_JSON.getData();
+            if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID] = EDITOR_JSON.getData();
             if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
             updateCard(false);
             $("#btn_apply").html('APPLY');
@@ -52,7 +53,13 @@ async function set_header_actions(){
     });    
     $("#btn_print").click(async ()=>{
         main.changePage("printCards");
-    });   
+    });  
+    $("#btn_add_node").click(async ()=>{
+        if(!cardData.nodes) cardData.nodes = {};
+        let size = Object.keys(cardData.nodes).length;        
+        cardData.nodes["n"+size] = { backgroundColor:"blue",content:'NEWNODE',width:"50%",height:"50%",position:"absolute",top:0,left:0 };
+        updateCard();
+    });
 }
 
 async function loadCardList(){
@@ -67,9 +74,11 @@ async function loadCardList(){
     slcElem.append( $('<option value="ADD">+AGREGAR+</option>') ); 
     slcElem.change( async (e)=>{         
         var opt = slcElem.find("option:selected");
+        $("#btn_add_node").addClass("hidden");
         if (opt.val()=="DESIGN"){
             CURRENT_MODE="DESIGN"
             CURRENT_CARD_INDEX = 0;
+            $("#btn_add_node").removeClass("hidden");
         }else if (opt.val()=="ADD"){
             let size = Object.keys(cardData.cards).length;
             let newId = "c"+(size+1);
@@ -119,7 +128,7 @@ function select_node(e){
     CURRENT_NODE_ID = id;
     $('#btn_node_id').html(CURRENT_NODE_ID);    
     if( CURRENT_MODE=="DESIGN" ){
-        EDITOR_JSON.select(cardData.nodes[id].style);
+        EDITOR_JSON.select(cardData.nodes[id]);
     }else if(cardData.cards['c'+CURRENT_CARD_INDEX]){
         if(cardData.cards['c'+CURRENT_CARD_INDEX][id] ){
             EDITOR_JSON.select(cardData.cards['c'+CURRENT_CARD_INDEX][id]);

@@ -1,6 +1,6 @@
 import * as fireutils from "../../libs/fireutils.js";
 import * as fdb from "../../libs/firebase_realtime_basedata.js";
-import * as cardGen from "./components/cardGenerator.js";
+import * as cardGen from "./components/CardGenerator.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 var CURRENT_CARD_INDEX = 0;
