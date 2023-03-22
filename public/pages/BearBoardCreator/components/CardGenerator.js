@@ -12,24 +12,21 @@ export function createCard(_cardData,index=0){
 }
 
 function create_node(div,id){
-    var n = cardData.nodes[id];
-    n.id = id;
-    var child = $('<div id="'+n.id+'"/>');
-    if(n.type=="text"){
-        child.addClass('node')
-        .css('width',n.w)
-        .css('height',n.h)
-        .html(n.style.content);
-        if(n.style) child.css(n.style);
-    }
-    if(n.parent) $('#'+n.parent).append(child);
+    var data = cardData.nodes[id];
+    data.id = id;
+    var child = $('<div id="'+data.id+'"/>');
+    apply_css(child,data.style)
+    if(data.parent) $('#'+data.parent).append(child);
     else div.append(child);
-    //apply overrides 
+    //CARDS OVERRIDES
     if(
         cardData.cards['c'+CURRENT_CARD_INDEX] 
         && cardData.cards['c'+CURRENT_CARD_INDEX][id]
-    ){
-        child.css( cardData.cards['c'+CURRENT_CARD_INDEX][id] );
-        child.html(cardData.cards['c'+CURRENT_CARD_INDEX][id].content);
-    } 
+    ) apply_css(child,cardData.cards['c'+CURRENT_CARD_INDEX][id]);
+}
+
+function apply_css(node,data){
+    node.css(data);
+    if(data.content) node.html(data.content);
+    if(data.image) node.css('backgroundImage','url("'+data.image+'")');
 }

@@ -87,7 +87,8 @@ async function loadCardList(){
 function updateCard(deselectNodes = true){
     if(deselectNodes) deselect_node(); 
     $('#card_space').remove();
-    let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX);  
+    let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX); 
+    div.click(select_node); 
     $('#design_work_space').append(div);
     recalculateCardScale();
 }
@@ -108,31 +109,6 @@ function get_json_from_pre(idElem){
     //console.log("@@@"+str);
     return JSON.parse(str);
 }
-/*
-function create_node(id){
-    var n = cardData.nodes[id];
-    n.id = id;
-    var child = $('<div id="'+n.id+'"/>');
-    if(n.type=="text"){
-        child.addClass('node')
-        .css('width',n.w)
-        .css('height',n.h)
-        .html(n.style.content);
-        if(n.style) child.css(n.style);
-    }
-    if(n.parent) $('#'+n.parent).append(child);
-    else $('#card_space').append(child);
-    child.click(select_node);
-    //apply overrides 
-    if(
-        CURRENT_MODE=="CARDS" 
-        && cardData.cards['c'+CURRENT_CARD_INDEX] 
-        && cardData.cards['c'+CURRENT_CARD_INDEX][id]
-    ){
-        child.css( cardData.cards['c'+CURRENT_CARD_INDEX][id] );
-        child.html(cardData.cards['c'+CURRENT_CARD_INDEX][id].content);
-    } 
-}*/
 
 function select_node(e){
     let id = $(e.target).attr('id');
