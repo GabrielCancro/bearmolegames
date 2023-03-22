@@ -3,6 +3,7 @@ import * as fdb from "../../libs/firebase_realtime_basedata.js";
 import JsonEditor from "./components/JsonEditor.js";
 import * as fontLoader from "./components/FontLoader.js";
 import * as main from "/js/main.js";
+import * as cardGen from "./components/cardGenerator.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 export async function initPage(){ 
@@ -17,7 +18,7 @@ export async function initPage(){
 
 var EDITOR_JSON;
 var CURRENT_NODE_ID = null;
-var CURRENT_CARD_INDEX = 1;
+var CURRENT_CARD_INDEX = 0;
 var CURRENT_MODE = "DESIGN"; // DESIGN-CARDS
 
 async function set_header_actions(){
@@ -68,6 +69,7 @@ async function loadCardList(){
         var opt = slcElem.find("option:selected");
         if (opt.val()=="DESIGN"){
             CURRENT_MODE="DESIGN"
+            CURRENT_CARD_INDEX = 0;
         }else if (opt.val()=="ADD"){
             let size = Object.keys(cardData.cards).length;
             let newId = "c"+(size+1);
@@ -84,11 +86,9 @@ async function loadCardList(){
 
 function updateCard(deselectNodes = true){
     if(deselectNodes) deselect_node(); 
-    var rootElement = $('#card_space')
-    rootElement.css('width',cardData.size_x);
-    rootElement.css('height',cardData.size_y);
-    $('#card_space').html('');  
-    for(var id in cardData.nodes) create_node(id);
+    $('#card_space').remove();
+    let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX);  
+    $('#design_work_space').append(div);
     recalculateCardScale();
 }
 
@@ -108,7 +108,7 @@ function get_json_from_pre(idElem){
     //console.log("@@@"+str);
     return JSON.parse(str);
 }
-
+/*
 function create_node(id){
     var n = cardData.nodes[id];
     n.id = id;
@@ -132,7 +132,7 @@ function create_node(id){
         child.css( cardData.cards['c'+CURRENT_CARD_INDEX][id] );
         child.html(cardData.cards['c'+CURRENT_CARD_INDEX][id].content);
     } 
-}
+}*/
 
 function select_node(e){
     let id = $(e.target).attr('id');
