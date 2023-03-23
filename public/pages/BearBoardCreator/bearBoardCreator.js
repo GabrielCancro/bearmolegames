@@ -10,7 +10,7 @@ export async function initPage(){
     console.log("https://sites.google.com/view/usefulweb-devtips/home");
     $('<link>').appendTo('head').attr({type: 'text/css', rel: 'stylesheet',href: 'pages/BearBoardCreator/styles.css'});
     EDITOR_JSON = new JsonEditor("json_editor"); 
-    if(!window.CURRENT_BBC_PROJECT_SELECTED) window.CURRENT_BBC_PROJECT_SELECTED = "testProject01";
+    if(!window.CURRENT_BBC_PROJECT_SELECTED) window.CURRENT_BBC_PROJECT_SELECTED = "chozadepts";
     await loadFile(window.CURRENT_BBC_PROJECT_SELECTED);
     loadCardList();
     set_header_actions();
@@ -100,6 +100,9 @@ function updateCard(deselectNodes = true){
     div.click(select_node); 
     $('#design_work_space').append(div);
     recalculateCardScale();
+    let nodesList = "Nodos: ";
+    for(let n of Object.keys(cardData.nodes)) nodesList += n+" ";
+    $('#nodes_list').html(nodesList);
 }
 
 function recalculateCardScale(){
@@ -171,7 +174,8 @@ async function loadFile(projectName){
     var save_mail = fireutils.getUser().email.replace("@","_").replace(".","_");
     var data = await fdb.read_db("bear_board_creator/"+save_mail+"/projects/"+projectName);
     if(data) cardData = data;
-    if(!cardData.cards) cardData['cards']= { c1:{},c2:{} };
+    if(!cardData.cards) cardData['cards']= {};
+    if(!cardData.nodes) cardData['nodes']= {};
     $("#btn_project").html(cardData.projectName);
     updateCard();
 }
