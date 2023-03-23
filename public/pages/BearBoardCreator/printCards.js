@@ -18,13 +18,21 @@ export async function initPage(){
 }
 
 function createAllCards(){
+    $('#print_paper').css('width','21cm'); //21cm
+    $('#print_paper').css('height','30.6cm'); //29.7cm
 	$('#print_work_space').html('');
 	for( let c in cardData.cards){
 		console.log(c);
-		CURRENT_CARD_INDEX += 1;
-		let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX);
-		$('#print_work_space').append(div);
+		CURRENT_CARD_INDEX += 1; 
+        let amount = 1;
+        if(cardData.cards['c'+CURRENT_CARD_INDEX] && cardData.cards['c'+CURRENT_CARD_INDEX].amount) amount = cardData.cards['c'+CURRENT_CARD_INDEX].amount
+        for (let i=0; i<amount; i++) {
+            let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX);
+		    $('#print_work_space').append(div);
+        }		
 	}
+    $('.card_print').css('margin-bottom','.13cm');
+    $('.card_print').css('margin-right','.13cm');
 }
 
 async function loadFile(projectName){

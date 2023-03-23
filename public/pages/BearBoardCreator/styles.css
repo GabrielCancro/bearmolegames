@@ -49,7 +49,7 @@ body{border:none !important;}
     border: 2px solid black;
     border-radius: .3em;
 }
-#card_space {
+#design_work_space #card_space {
     position: relative;
     top: 50%;
     left: 50%;
@@ -58,21 +58,25 @@ body{border:none !important;}
     width: 100%;
     height: 100%;
     box-shadow: 0px 0px 0px 2px #000; 
-    
 }
 
-#card_space .node{
+#design_work_space #card_space .node{
     user-select: none;
 }
-#card_space .node.selected{
+#design_work_space #card_space .node:hover{
     z-index: 99999;
     opacity: .9;
-    box-shadow: 0px 0px 0px 2px #7070F0;
 }
-#card_space .node:hover{
-    z-index: 99999;
-    opacity: .9;
-    box-shadow: 0px 0px 0px 2px yellow;
+#selector_node{
+    position: absolute;
+    border: 2px solid cornflowerblue;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin-top: -1px;
+    margin-left: -1px;
 }
 #design_body #design_edit_panel{
     display: inline-block;

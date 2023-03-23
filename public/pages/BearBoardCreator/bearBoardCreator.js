@@ -26,7 +26,7 @@ async function set_header_actions(){
     $("#btn_project").click(()=>{
         main.changePage("bbcProjects");
     });
-    $("#btn_save").click(async ()=>{
+    /*$("#btn_save").click(async ()=>{
         $("#btn_save").html("SAVING..");
         await saveFile(cardData,"nodesData.json");
         $("#btn_save").html("SAVE");
@@ -35,9 +35,10 @@ async function set_header_actions(){
     $("#btn_load").click(()=>{
         loadFile(cardData.projectName);
         
-    });    
+    }); */   
     $("#btn_apply").click(async ()=>{
-        console.log("CARD DATA",cardData);
+        //console.log("CARD DATA",cardData);
+        $("#btn_apply").html('WAIT..');
         if(!CURRENT_NODE_ID){
             deselect_node();
             return;
@@ -45,11 +46,12 @@ async function set_header_actions(){
         try{
             if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID] = EDITOR_JSON.getData();
             if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
-            updateCard(false);
-            $("#btn_apply").html('APPLY');
+            updateCard(false);            
+            await saveFile(cardData,"nodesData.json");
             reselect_node();
+            $("#btn_apply").html('APPLY');
         }catch(e){
-            console.log(e);
+            //console.log(e);
             $("#btn_apply").html('ERROR');            
         }        
     });    
@@ -141,7 +143,8 @@ function select_node(e){
         return;
     }
     CURRENT_NODE_ID = id;
-    $('#btn_node_id').html(CURRENT_NODE_ID);    
+    $('#btn_node_id').html(CURRENT_NODE_ID);  
+    set_selector_node(CURRENT_NODE_ID);  
     if( CURRENT_MODE=="DESIGN" ){
         EDITOR_JSON.select(cardData.nodes[id]);
     }else if(cardData.cards['c'+CURRENT_CARD_INDEX]){
@@ -149,6 +152,12 @@ function select_node(e){
             EDITOR_JSON.select(cardData.cards['c'+CURRENT_CARD_INDEX][id]);
         } else EDITOR_JSON.select({});
     } else EDITOR_JSON.deselect();  
+}
+
+function set_selector_node(){
+    var node = $("#"+CURRENT_NODE_ID);
+    $('#selector_node').remove();
+    if(node) node.append( $('<div id="selector_node"></div>') );    
 }
 
 function reselect_node(){
@@ -160,6 +169,7 @@ function reselect_node(){
 function deselect_node(){
     CURRENT_NODE_ID = -1;
     EDITOR_JSON.deselect();
+    $('#selector_node').remove();
 }
 
 async function saveFile(data, filename){
