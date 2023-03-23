@@ -26,8 +26,10 @@ async function set_header_actions(){
     $("#btn_project").click(()=>{
         main.changePage("bbcProjects");
     });
-    $("#btn_save").click(()=>{
-        saveFile(cardData,"nodesData.json");
+    $("#btn_save").click(async ()=>{
+        $("#btn_save").html("SAVING..");
+        await saveFile(cardData,"nodesData.json");
+        $("#btn_save").html("SAVE");
         recalculateCardScale();
     });
     $("#btn_load").click(()=>{
@@ -100,9 +102,19 @@ function updateCard(deselectNodes = true){
     div.click(select_node); 
     $('#design_work_space').append(div);
     recalculateCardScale();
-    let nodesList = "Nodos: ";
-    for(let n of Object.keys(cardData.nodes)) nodesList += n+" ";
-    $('#nodes_list').html(nodesList);
+    updateNodeList();
+}
+
+function updateNodeList(){
+    $('#nodes_list').html('');
+    for(let n of Object.keys(cardData.nodes)){
+        var btn = $("<span class='nodeListButton'>"+n+"</span>");
+        btn.click( ()=>{
+            select_node({target:$("#"+n)});
+        });
+        $('#nodes_list').append(btn);
+    }
+    
 }
 
 function recalculateCardScale(){
@@ -150,14 +162,14 @@ function deselect_node(){
     EDITOR_JSON.deselect();
 }
 
-function saveFile(data, filename){
+async function saveFile(data, filename){
     var text = JSON.stringify(data);
     /*var a = document.createElement('a');
     a.setAttribute('href', 'data:text/plain;charset=utf-8,'+encodeURIComponent(text));
     a.setAttribute('download', filename);
     a.click();*/
     var save_mail = fireutils.getUser().email.replace("@","_").replace(".","_");
-    fdb.write_db("bear_board_creator/"+save_mail+"/projects",cardData.projectName,cardData);
+    await fdb.write_db("bear_board_creator/"+save_mail+"/projects",cardData.projectName,cardData);
 }
 
 async function loadFile(projectName){
