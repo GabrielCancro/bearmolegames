@@ -1,6 +1,7 @@
 import * as fireutils from "../../libs/fireutils.js";
 import * as fdb from "../../libs/firebase_realtime_basedata.js";
 import * as cardGen from "./components/CardGenerator.js";
+import * as main from "/js/main.js";
 
 export var pageRoot = "pages/BearBoardCreator";
 var CURRENT_CARD_INDEX = 0;
@@ -10,38 +11,36 @@ export async function initPage(){
     $('<link>').appendTo('head').attr({type: 'text/css', rel: 'stylesheet',href: 'pages/BearBoardCreator/styles.css'}); 
     $('<link>').appendTo('head').attr({type: 'text/css', rel: 'stylesheet',href: 'pages/BearBoardCreator/print_styles.css'}); 
     //$('<link>').appendTo('head').attr({type: 'application/javascript',href: 'pages/BearBoardCreator/components/html2pdf.bundle.min'}); 
-    await loadFile(window.CURRENT_BBC_PROJECT_SELECTED);
+    cardData = window.CARD_DATA_TO_PRINT;
+    console.log(cardData)
+    createAllCards();
     $("#btn_print").click(async ()=>{
         print('print_paper');
     }); 
-
+    $("#btn_back").click(async ()=>{
+        main.changePage("bearBoardCreator");
+    }); 
 }
 
 function createAllCards(){
+    $('#body').html('');
     $('#print_paper').css('width','21cm'); //21cm
     $('#print_paper').css('height','30.6cm'); //29.7cm
 	$('#print_work_space').html('');
-	for( let c in cardData.cards){
-		console.log(c);
+    CURRENT_CARD_INDEX = 0;
+	for( let c in cardData.cards){		
 		CURRENT_CARD_INDEX += 1; 
         let amount = 1;
         if(cardData.cards['c'+CURRENT_CARD_INDEX] && cardData.cards['c'+CURRENT_CARD_INDEX].amount) amount = cardData.cards['c'+CURRENT_CARD_INDEX].amount
+        console.log(c+": "+amount);
         for (let i=0; i<amount; i++) {
+            console.log("    -",);
             let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX);
 		    $('#print_work_space').append(div);
         }		
 	}
-    $('.card_print').css('margin-bottom','.13cm');
-    $('.card_print').css('margin-right','.13cm');
-}
-
-async function loadFile(projectName){
-    var save_mail = fireutils.getUser().email.replace("@","_").replace(".","_");
-    var data = await fdb.read_db("bear_board_creator/"+save_mail+"/projects/"+projectName);
-    if(data) cardData = data;
-    if(!cardData.cards) cardData['cards']= { c1:{},c2:{} };
-    $("#btn_project").html(cardData.projectName);
-    createAllCards();
+    $('.card_print').css('margin-bottom','0.01cm');
+    $('.card_print').css('margin-right','0.01cm');
 }
 
 export function print(id){

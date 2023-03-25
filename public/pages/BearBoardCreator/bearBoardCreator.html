@@ -6,10 +6,15 @@
         <div id="btn_load" class="ds_btn">LOAD</div>-->
         <div id="btn_apply" class="ds_btn">APPLY</div>
         <div id="btn_print" class="ds_btn">PRINT</div>
-        <div id="btn_node_id" class="ds_btn">-</div>        
+        <div id="btn_node_id" class="ds_btn">-</div>    
+        <input id="amount_card" class="ds_btn hidden" value="1"></input>
+        <div id="delete_card" class="ds_btn hidden red">DELETE CARD</div>    
     </div>
     <div id="design_body">
-        <div id="btn_add_node" class="ds_btn">+</div>
+        <div id="add_node_panel">
+            <div id="btn_add_text" class="ds_btn">+TX</div>
+            <div id="btn_add_img" class="ds_btn">+IMG</div>
+        </div>
         <div id="design_work_space">
             <div id="card_space">
                 <div class="node n1"></div>
@@ -17,7 +22,10 @@
             </div>
         </div>
         <div id="design_edit_panel">
-            <h3>EDITOR DE NODOS</h3>
+            <div id="nodes_editor_header">
+                <h3>EDITOR DE NODOS</h3>                
+                <div id="delete_node" class="ds_btn hidden red">DELETE NODE</div>
+            </div>
             <div id="json_editor"></div>
             <p id="nodes_list"></p>
         </div>

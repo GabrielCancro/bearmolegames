@@ -26,16 +26,6 @@ async function set_header_actions(){
     $("#btn_project").click(()=>{
         main.changePage("bbcProjects");
     });
-    /*$("#btn_save").click(async ()=>{
-        $("#btn_save").html("SAVING..");
-        await saveFile(cardData,"nodesData.json");
-        $("#btn_save").html("SAVE");
-        recalculateCardScale();
-    });
-    $("#btn_load").click(()=>{
-        loadFile(cardData.projectName);
-        
-    }); */   
     $("#btn_apply").click(async ()=>{
         //console.log("CARD DATA",cardData);
         $("#btn_apply").html('WAIT..');
@@ -48,7 +38,6 @@ async function set_header_actions(){
             if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
             updateCard(false);            
             await saveFile(cardData,"nodesData.json");
-            reselect_node();
             $("#btn_apply").html('APPLY');
         }catch(e){
             //console.log(e);
@@ -56,14 +45,44 @@ async function set_header_actions(){
         }        
     });    
     $("#btn_print").click(async ()=>{
+        window.CARD_DATA_TO_PRINT = cardData;
         main.changePage("printCards");
     });  
-    $("#btn_add_node").click(async ()=>{
-        if(!cardData.nodes) cardData.nodes = {};
-        let size = Object.keys(cardData.nodes).length;        
-        cardData.nodes["n"+size] = { backgroundColor:"blue",content:'NEWNODE',width:"50%",height:"50%",position:"absolute",top:0,left:0 };
+    $("#delete_node").click(async ()=>{
+        delete cardData.nodes[CURRENT_NODE_ID];
         updateCard();
+        await saveFile(cardData,"nodesData.json");
     });
+    $("#btn_add_text").click(async ()=>{
+        cardData.idNewNodes += 1;         
+        cardData.nodes["n"+cardData.idNewNodes] = { 
+            type: "text",
+            content:"TEXTO", textAlign:"left", fontSize:"12pt", fontFamily:"Arial",
+            fontStyle: "normal",fontWeight: "normal",zIndex:"auto",
+            width:"100%",height:"auto",position:"absolute",top:0,left:0 
+        };
+        updateCard();
+        await saveFile(cardData,"nodesData.json");
+    });
+    $("#btn_add_img").click(async ()=>{        
+        cardData.idNewNodes += 1;       
+        cardData.nodes["n"+cardData.idNewNodes] = { 
+            type: "image",
+            image:'https://source.unsplash.com/random/200x200?sig=1', 
+            backgroundSize:"100% 100%", zIndex:"auto",
+            width:"50%",height:"50%",position:"absolute",top:0,left:0 
+        };
+        updateCard();
+        await saveFile(cardData,"nodesData.json");
+    });
+    
+    $("#amount_card").change(async ()=>{ 
+        var val = parseInt($("#amount_card").val());
+        if(val==undefined) return;
+        if(CURRENT_CARD_INDEX<=0) return;
+        cardData.cards['c'+CURRENT_CARD_INDEX].amount = val;
+        await saveFile(cardData,"nodesData.json");
+    });      
 }
 
 async function loadCardList(){
@@ -77,12 +96,10 @@ async function loadCardList(){
     }
     slcElem.append( $('<option value="ADD">+AGREGAR+</option>') ); 
     slcElem.change( async (e)=>{         
-        var opt = slcElem.find("option:selected");
-        $("#btn_add_node").addClass("hidden");
+        var opt = slcElem.find("option:selected");        
         if (opt.val()=="DESIGN"){
             CURRENT_MODE="DESIGN"
-            CURRENT_CARD_INDEX = 0;
-            $("#btn_add_node").removeClass("hidden");
+            CURRENT_CARD_INDEX = 0;           
         }else if (opt.val()=="ADD"){
             let size = Object.keys(cardData.cards).length;
             let newId = "c"+(size+1);
@@ -98,13 +115,16 @@ async function loadCardList(){
 }
 
 function updateCard(deselectNodes = true){
-    if(deselectNodes) deselect_node(); 
+    if(deselectNodes) deselect_node();
     $('#card_space').remove();
     let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX); 
     div.click(select_node); 
     $('#design_work_space').append(div);
     recalculateCardScale();
+    set_selector_node();
     updateNodeList();
+    updateInterface();    
+    
 }
 
 function updateNodeList(){
@@ -115,8 +135,24 @@ function updateNodeList(){
             select_node({target:$("#"+n)});
         });
         $('#nodes_list').append(btn);
+    }    
+}
+
+function updateInterface(){
+    if(CURRENT_MODE=="DESIGN"){
+        $("#add_node_panel").removeClass("hidden");        
+        if(CURRENT_NODE_ID) $('#delete_node').removeClass("hidden");
+        else $('#delete_node').addClass("hidden");
+        $('#amount_card').addClass("hidden");
+        $('#delete_card').addClass("hidden");
+    }else{
+        $("#add_node_panel").addClass("hidden");
+        $('#delete_node').addClass("hidden");
+        $('#amount_card').removeClass("hidden");        
+        $('#delete_card').removeClass("hidden");
     }
-    
+    $('#btn_node_id').html(CURRENT_NODE_ID); 
+    if(CURRENT_CARD_INDEX>0) $("#amount_card").val(cardData.cards['c'+CURRENT_CARD_INDEX].amount);
 }
 
 function recalculateCardScale(){
@@ -137,13 +173,11 @@ function get_json_from_pre(idElem){
 }
 
 function select_node(e){
+    deselect_node();
     let id = $(e.target).attr('id');
-    if(CURRENT_NODE_ID==id){
-        deselect_node();
-        return;
-    }
-    CURRENT_NODE_ID = id;
-    $('#btn_node_id').html(CURRENT_NODE_ID);  
+    if(id=="selector_node" || CURRENT_NODE_ID==id) return;
+    CURRENT_NODE_ID = id;     
+    updateInterface();
     set_selector_node(CURRENT_NODE_ID);  
     if( CURRENT_MODE=="DESIGN" ){
         EDITOR_JSON.select(cardData.nodes[id]);
@@ -157,7 +191,7 @@ function select_node(e){
 function set_selector_node(){
     var node = $("#"+CURRENT_NODE_ID);
     $('#selector_node').remove();
-    if(node) node.append( $('<div id="selector_node"></div>') );    
+    if(node) node.append( $('<div id="selector_node"></div>') );   
 }
 
 function reselect_node(){
@@ -167,9 +201,10 @@ function reselect_node(){
 }
 
 function deselect_node(){
-    CURRENT_NODE_ID = -1;
+    CURRENT_NODE_ID = null;
     EDITOR_JSON.deselect();
     $('#selector_node').remove();
+    updateInterface();
 }
 
 async function saveFile(data, filename){
@@ -198,6 +233,7 @@ async function loadFile(projectName){
     if(data) cardData = data;
     if(!cardData.cards) cardData['cards']= {};
     if(!cardData.nodes) cardData['nodes']= {};
+    if(!cardData.idNewNodes) cardData['idNewNodes']= 0;
     $("#btn_project").html(cardData.projectName);
     updateCard();
 }
