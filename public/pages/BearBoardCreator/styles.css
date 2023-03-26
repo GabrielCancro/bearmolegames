@@ -14,6 +14,12 @@ body{border:none !important;}
 .ds_btn:hover {
     background-color: #D9D9F9;
 }
+input.ds_btn{ 
+    background-color: #D9D9FF; 
+    padding: 0 .2em;
+    text-align: center;
+    border-top: solid #707070;
+}
 #slc_cards{
     display: inline-block;
     text-align: center;
@@ -139,7 +145,7 @@ body{border:none !important;}
     border: 2px solid #303030;
     border-radius: .2em;
 }
-#amount_card{
-    width: 2em;
+#amount_card, #size_card_x, #size_card_y {
+    width: 5em;
     font-weight: bold;
 }

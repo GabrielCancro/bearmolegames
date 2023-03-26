@@ -85,3 +85,16 @@ body {
     pointer-events: none;
     opacity: .3;
 }
+
+.floatText{
+    position: fixed;
+    top:0;
+    left: 0;
+    margin: 1em;
+    min-height: 2em;
+    min-width: 10em;
+    text-align: center;
+    line-height: 2em;
+    padding: 0 1em;
+    background-color: rgba(80,250,80,.7);
+}

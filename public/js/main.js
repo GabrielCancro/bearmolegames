@@ -50,4 +50,13 @@ export async function changePage(pageName){
 	});
 }
 
+export async function showfloatText(msg){
+	$('.floatText').remove();
+	var div = $('<div class="floatText">'+msg+'</div>');
+	$('body').append(div);
+	return new Promise((resolve) => setTimeout(()=>{
+		div.remove();
+		resolve();
+	}, 500+msg.length*110));
+}
 

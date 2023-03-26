@@ -28,14 +28,18 @@ async function set_header_actions(){
     });
     $("#btn_apply").click(async ()=>{
         //console.log("CARD DATA",cardData);
-        $("#btn_apply").html('WAIT..');
         if(!CURRENT_NODE_ID){
             deselect_node();
             return;
         }
+        $("#btn_apply").html('WAIT..');
         try{
             if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID] = EDITOR_JSON.getData();
             if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
+            if($('#size_card_x').val()) cardData.size_x = $('#size_card_x').val();
+            if($('#size_card_y').val()) cardData.size_y = $('#size_card_y').val();
+            $('#size_card_x').val('');
+            $('#size_card_y').val('');
             updateCard(false);            
             await saveFile(cardData,"nodesData.json");
             $("#btn_apply").html('APPLY');
@@ -74,25 +78,36 @@ async function set_header_actions(){
         };
         updateCard();
         await saveFile(cardData,"nodesData.json");
-    });
-    
+    });    
     $("#amount_card").change(async ()=>{ 
         var val = parseInt($("#amount_card").val());
         if(val==undefined) return;
         if(CURRENT_CARD_INDEX<=0) return;
         cardData.cards['c'+CURRENT_CARD_INDEX].amount = val;
         await saveFile(cardData,"nodesData.json");
-    });      
+    });  
+    $("#delete_card").click(async ()=>{
+        $("#delete_card").html('DELETING..');
+        console.log(cardData.cards['c'+CURRENT_CARD_INDEX])
+        delete cardData.cards['c'+CURRENT_CARD_INDEX];
+        var index = $("#slc_cards").prop('selectedIndex')
+        loadCardList();
+        await saveFile(cardData,"nodesData.json");
+        $("#delete_card").html('DELETE CARD');        
+        $("#slc_cards").prop('selectedIndex',index-1);
+        $("#slc_cards").change();
+    });  
+    
 }
 
-async function loadCardList(){
+function loadCardList(){
     var slcElem = $("#slc_cards").html('<option selected value="DESIGN"> # DISEÑO # </option>');
     var index = 0
     for(var card in cardData.cards){
         index += 1;
         let cardName = card;
         if(cardData.cards[card].cardName) cardName = cardData.cards[card].cardName;        
-        slcElem.append( $('<option value="'+index+'">'+cardName+'</option>') );  
+        slcElem.append( $('<option value="'+card+'">'+cardName+'</option>') );  
     }
     slcElem.append( $('<option value="ADD">+AGREGAR+</option>') ); 
     slcElem.change( async (e)=>{         
@@ -100,15 +115,21 @@ async function loadCardList(){
         if (opt.val()=="DESIGN"){
             CURRENT_MODE="DESIGN"
             CURRENT_CARD_INDEX = 0;           
-        }else if (opt.val()=="ADD"){
-            let size = Object.keys(cardData.cards).length;
-            let newId = "c"+(size+1);
-            cardData.cards[newId] = {cardName:"card_"+(size+1)};
+        }else if (opt.val()=="ADD"){            
+            cardData.idNewCards += 1;
+            let newId = "c"+cardData['idNewCards'];
+            cardData.cards[newId] = {
+                cardName:"card_"+cardData['idNewCards'],
+                index:cardData['idNewCards'],
+            };
+            //console.log( "@@@",slcElem.val() )
             loadCardList();
-            slcElem.val(size+1);
+            let size = Object.keys(cardData.cards).length;            
+            slcElem.prop('selectedIndex',size);
+            slcElem.change();            
         }else{
             CURRENT_MODE="CARDS"
-            CURRENT_CARD_INDEX = opt.val();
+            CURRENT_CARD_INDEX = cardData.cards[opt.val()].index;
         }
         updateCard();
     });
@@ -145,11 +166,17 @@ function updateInterface(){
         else $('#delete_node').addClass("hidden");
         $('#amount_card').addClass("hidden");
         $('#delete_card').addClass("hidden");
+        $('#size_card_x').removeClass("hidden");        
+        $('#size_card_x').attr('placeholder',cardData.size_x);
+        $('#size_card_y').removeClass("hidden");        
+        $('#size_card_y').attr('placeholder',cardData.size_y);
     }else{
         $("#add_node_panel").addClass("hidden");
         $('#delete_node').addClass("hidden");
         $('#amount_card').removeClass("hidden");        
         $('#delete_card').removeClass("hidden");
+        $('#size_card_x').addClass("hidden");
+        $('#size_card_y').addClass("hidden");
     }
     $('#btn_node_id').html(CURRENT_NODE_ID); 
     if(CURRENT_CARD_INDEX>0) $("#amount_card").val(cardData.cards['c'+CURRENT_CARD_INDEX].amount);
@@ -233,7 +260,8 @@ async function loadFile(projectName){
     if(data) cardData = data;
     if(!cardData.cards) cardData['cards']= {};
     if(!cardData.nodes) cardData['nodes']= {};
-    if(!cardData.idNewNodes) cardData['idNewNodes']= 0;
+    if(!cardData.idNewNodes) cardData['idNewNodes']= Object.keys(cardData.nodes).length;
+    if(!cardData.idNewCards) cardData['idNewCards']= Object.keys(cardData.cards).length;
     $("#btn_project").html(cardData.projectName);
     updateCard();
 }
