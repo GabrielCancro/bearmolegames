@@ -150,6 +150,7 @@ input.ds_btn{
     font-weight: bold;
 }
 
+
 @media (max-aspect-ratio: 3/4) {
     #design_body  #design_work_space{
         width: 100%;

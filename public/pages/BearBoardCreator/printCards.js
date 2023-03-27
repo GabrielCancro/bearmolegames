@@ -19,13 +19,21 @@ export async function initPage(){
     $("#btn_back").click(async ()=>{
         main.changePage("bearBoardCreator");
     }); 
+    $("#btn_config").click(async ()=>{
+        $("#config_page_bg").removeClass("hidden");        
+        $("#cnf_page_w").attr('placeholder',cardData.page_size_x);
+        $("#cnf_page_h").attr('placeholder',cardData.page_size_y);
+        $("#cnf_int_margin").attr('placeholder',cardData.internal_margin);
+    }); 
+    $("#btn_close_config_page").click(async ()=>{
+        $("#config_page_bg").addClass("hidden");        
+        apply_config();
+    }); 
 }
 
 function createAllCards(){
-    $('#body').html('');
-    $('#print_paper').css('width','21cm'); //21cm
-    $('#print_paper').css('height','30.6cm'); //29.7cm
-	  $('#print_work_space').html('');
+  $('#print_work_space').html('');
+  apply_css_page();
 	for( let c in cardData.cards){
         let amount = 1;
         if(cardData.cards[c] && cardData.cards[c].amount) amount = cardData.cards[c].amount
@@ -36,8 +44,6 @@ function createAllCards(){
 		    $('#print_work_space').append(div);
         }		
 	}
-    $('.card_print').css('margin-bottom','0.01cm');
-    $('.card_print').css('margin-right','0.01cm');
 }
 
 export function print(id){
@@ -57,4 +63,37 @@ export function print(id){
   tab.print();
   tab.close();
   return true;
+}
+
+async function apply_config(){
+    var sx = $("#cnf_page_w").val();
+    if(sx!=""){
+      cardData.page_size_x = sx;      
+      $("#cnf_page_w").val('');
+    } 
+    var sy = $("#cnf_page_h").val();
+    if(sy!=""){ 
+      cardData.page_size_y = sy;
+      $("#cnf_page_h").val('');
+    }
+    var im = $("#cnf_int_margin").val();
+    if(im!=""){ 
+      cardData.internal_margin = im;
+      $("#cnf_int_margin").val('');
+    }
+    cnf_int_margin
+
+    apply_css_page();
+    var save_mail = fireutils.getUser().email.replace("@","_").replace(".","_");
+    await fdb.write_db("bear_board_creator/"+save_mail+"/projects",cardData.projectName,cardData);
+}
+
+function apply_css_page(){
+  if(!cardData.page_size_x) cardData.page_size_x = '21cm';
+  if(!cardData.page_size_y) cardData.page_size_y = '29.7cm';
+  $('#print_paper').css('width',cardData.page_size_x);
+  $('#print_paper').css('height',cardData.page_size_y);
+  if(!cardData.internal_margin) cardData.internal_margin = "0.02cm";
+  $('.card_print').css('margin-bottom',cardData.internal_margin);
+  $('.card_print').css('margin-right',cardData.internal_margin);
 }
