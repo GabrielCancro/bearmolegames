@@ -1,7 +1,10 @@
 import * as fireutils from "../../libs/fireutils.js";
 import * as fdb from "../../libs/firebase_realtime_basedata.js";
 import * as cardGen from "./components/CardGenerator.js";
+//import * as jspdf from "./components/jspdf.min.js";
 import * as main from "/js/main.js";
+
+
 
 export var pageRoot = "pages/BearBoardCreator";
 var cardData;
@@ -47,6 +50,27 @@ function createAllCards(){
 }
 
 export function print(id){
+  
+  /*var doc = new jsPDF();
+  var elementHTML = $('#print_paper').html();
+  var specialElementHandlers = {
+      '#print_work_space': function (element, renderer) {
+          return true;
+      }
+  };
+  doc.fromHTML(elementHTML, 15, 15, {
+    'width': 170,
+    'elementHandlers': specialElementHandlers
+  });
+
+
+// Save the PDF
+doc.save('sample-document.pdf');
+
+*/
+var element = document.getElementById('print_work_space');
+var worker = html2pdf().from(element).toImg().save();
+  return;
 	window.print();
 	return;
 	var element = document.getElementById(id);
