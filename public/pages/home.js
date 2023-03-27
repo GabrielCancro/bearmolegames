@@ -12,7 +12,7 @@ export async function initPage(){
         main.changePage("login");      
     });
     $("#btn_bbc").click(()=>{
-    	main.changePage("bearBoardCreator"); 
+    	main.changePage("bbcProjects"); 
     });
     
 }

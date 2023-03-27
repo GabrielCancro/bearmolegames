@@ -1,7 +1,8 @@
 body{border:none !important;}
-#design_header{        
+#design_header{  
+    display: inline-block;      
     width: 100%;
-    height: 2em;
+    line-height: 2em;
     background-color: black;
 }
 .ds_btn {
@@ -24,8 +25,7 @@ input.ds_btn{
     display: inline-block;
     text-align: center;
     background-color: #A9A9F9;
-    line-height: 2em;
-    height: 100%;
+    height: 2em;
     padding: 0;
     margin: 0;
     user-select: none;
@@ -148,4 +148,15 @@ input.ds_btn{
 #amount_card, #size_card_x, #size_card_y {
     width: 5em;
     font-weight: bold;
+}
+
+@media (max-aspect-ratio: 3/4) {
+    #design_body  #design_work_space{
+        width: 100%;
+        height: 40%;
+    }
+    #design_body  #design_edit_panel{
+        width: 100%;
+        height: 40%;
+    }
 }

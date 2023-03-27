@@ -19,7 +19,7 @@ export async function initPage(){
 
 var EDITOR_JSON;
 var CURRENT_NODE_ID = null;
-var CURRENT_CARD_INDEX = 0;
+var CURRENT_CARD_ID = null;
 var CURRENT_MODE = "DESIGN"; // DESIGN-CARDS
 
 async function set_header_actions(){
@@ -35,7 +35,7 @@ async function set_header_actions(){
         $("#btn_apply").html('WAIT..');
         try{
             if(CURRENT_MODE=="DESIGN") cardData.nodes[CURRENT_NODE_ID] = EDITOR_JSON.getData();
-            if(CURRENT_MODE=="CARDS") cardData.cards["c"+CURRENT_CARD_INDEX][CURRENT_NODE_ID] = EDITOR_JSON.getData();
+            if(CURRENT_MODE=="CARDS") cardData.cards[CURRENT_CARD_ID][CURRENT_NODE_ID] = EDITOR_JSON.getData();
             if($('#size_card_x').val()) cardData.size_x = $('#size_card_x').val();
             if($('#size_card_y').val()) cardData.size_y = $('#size_card_y').val();
             $('#size_card_x').val('');
@@ -82,14 +82,14 @@ async function set_header_actions(){
     $("#amount_card").change(async ()=>{ 
         var val = parseInt($("#amount_card").val());
         if(val==undefined) return;
-        if(CURRENT_CARD_INDEX<=0) return;
-        cardData.cards['c'+CURRENT_CARD_INDEX].amount = val;
+        if(!CURRENT_CARD_ID) return;
+        cardData.cards[CURRENT_CARD_ID].amount = val;
         await saveFile(cardData,"nodesData.json");
     });  
     $("#delete_card").click(async ()=>{
         $("#delete_card").html('DELETING..');
-        console.log(cardData.cards['c'+CURRENT_CARD_INDEX])
-        delete cardData.cards['c'+CURRENT_CARD_INDEX];
+        console.log(cardData.cards[CURRENT_CARD_ID])
+        delete cardData.cards[CURRENT_CARD_ID];
         var index = $("#slc_cards").prop('selectedIndex')
         loadCardList();
         await saveFile(cardData,"nodesData.json");
@@ -102,10 +102,9 @@ async function set_header_actions(){
 
 function loadCardList(){
     var slcElem = $("#slc_cards").html('<option selected value="DESIGN"> # DISEÑO # </option>');
-    var index = 0
     for(var card in cardData.cards){
-        index += 1;
         let cardName = card;
+        resetCardName(card);
         if(cardData.cards[card].cardName) cardName = cardData.cards[card].cardName;        
         slcElem.append( $('<option value="'+card+'">'+cardName+'</option>') );  
     }
@@ -114,14 +113,11 @@ function loadCardList(){
         var opt = slcElem.find("option:selected");        
         if (opt.val()=="DESIGN"){
             CURRENT_MODE="DESIGN"
-            CURRENT_CARD_INDEX = 0;           
+            CURRENT_CARD_ID = null;           
         }else if (opt.val()=="ADD"){            
             cardData.idNewCards += 1;
             let newId = "c"+cardData['idNewCards'];
-            cardData.cards[newId] = {
-                cardName:"card_"+cardData['idNewCards'],
-                index:cardData['idNewCards'],
-            };
+            cardData.cards[newId] = { cardName:"NewCard" };
             //console.log( "@@@",slcElem.val() )
             loadCardList();
             let size = Object.keys(cardData.cards).length;            
@@ -129,7 +125,7 @@ function loadCardList(){
             slcElem.change();            
         }else{
             CURRENT_MODE="CARDS"
-            CURRENT_CARD_INDEX = cardData.cards[opt.val()].index;
+            CURRENT_CARD_ID = opt.val();
         }
         updateCard();
     });
@@ -138,14 +134,23 @@ function loadCardList(){
 function updateCard(deselectNodes = true){
     if(deselectNodes) deselect_node();
     $('#card_space').remove();
-    let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX); 
+    let div = cardGen.createCard(cardData,CURRENT_CARD_ID);    
     div.click(select_node); 
     $('#design_work_space').append(div);
     recalculateCardScale();
     set_selector_node();
     updateNodeList();
-    updateInterface();    
-    
+    updateInterface();     
+}
+
+function resetCardName(cardId){
+    if(!cardData.cards[cardId]) return;
+    for(let n in cardData.nodes){
+        if(cardData.nodes[n].isTitle!="true") continue;
+        if(!cardData.cards[cardId][n].content) continue;
+        cardData.cards[cardId].cardName = cardData.cards[cardId][n].content;
+        console.log(cardId+" > "+n+" :: "+cardData.cards[cardId].cardName); 
+    }
 }
 
 function updateNodeList(){
@@ -179,7 +184,7 @@ function updateInterface(){
         $('#size_card_y').addClass("hidden");
     }
     $('#btn_node_id').html(CURRENT_NODE_ID); 
-    if(CURRENT_CARD_INDEX>0) $("#amount_card").val(cardData.cards['c'+CURRENT_CARD_INDEX].amount);
+    if(CURRENT_CARD_ID) $("#amount_card").val(cardData.cards[CURRENT_CARD_ID].amount);
 }
 
 function recalculateCardScale(){
@@ -208,9 +213,9 @@ function select_node(e){
     set_selector_node(CURRENT_NODE_ID);  
     if( CURRENT_MODE=="DESIGN" ){
         EDITOR_JSON.select(cardData.nodes[id]);
-    }else if(cardData.cards['c'+CURRENT_CARD_INDEX]){
-        if(cardData.cards['c'+CURRENT_CARD_INDEX][id] ){
-            EDITOR_JSON.select(cardData.cards['c'+CURRENT_CARD_INDEX][id]);
+    }else if(cardData.cards[CURRENT_CARD_ID]){
+        if(cardData.cards[CURRENT_CARD_ID][id] ){
+            EDITOR_JSON.select(cardData.cards[CURRENT_CARD_ID][id]);
         } else EDITOR_JSON.select({});
     } else EDITOR_JSON.deselect();  
 }

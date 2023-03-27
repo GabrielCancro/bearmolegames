@@ -4,7 +4,6 @@ import * as cardGen from "./components/CardGenerator.js";
 import * as main from "/js/main.js";
 
 export var pageRoot = "pages/BearBoardCreator";
-var CURRENT_CARD_INDEX = 0;
 var cardData;
 
 export async function initPage(){ 
@@ -26,16 +25,14 @@ function createAllCards(){
     $('#body').html('');
     $('#print_paper').css('width','21cm'); //21cm
     $('#print_paper').css('height','30.6cm'); //29.7cm
-	$('#print_work_space').html('');
-    CURRENT_CARD_INDEX = 0;
-	for( let c in cardData.cards){		
-		CURRENT_CARD_INDEX += 1; 
+	  $('#print_work_space').html('');
+	for( let c in cardData.cards){
         let amount = 1;
-        if(cardData.cards['c'+CURRENT_CARD_INDEX] && cardData.cards['c'+CURRENT_CARD_INDEX].amount) amount = cardData.cards['c'+CURRENT_CARD_INDEX].amount
+        if(cardData.cards[c] && cardData.cards[c].amount) amount = cardData.cards[c].amount
         console.log(c+": "+amount);
         for (let i=0; i<amount; i++) {
             console.log("    -",);
-            let div = cardGen.createCard(cardData,CURRENT_CARD_INDEX);
+            let div = cardGen.createCard(cardData,c);
 		    $('#print_work_space').append(div);
         }		
 	}
