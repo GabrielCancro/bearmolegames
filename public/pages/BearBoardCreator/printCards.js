@@ -17,7 +17,11 @@ export async function initPage(){
     cardData = window.CARD_DATA_TO_PRINT;
     createAllCards();
     $("#btn_print").click(async ()=>{
-        print('print_paper');
+        window.print();
+    }); 
+    $("#btn_pdf").click(async ()=>{
+        var element = document.getElementById('print_work_space');
+        var worker = html2pdf().from(element).save();
     }); 
     $("#btn_back").click(async ()=>{
         main.changePage("bearBoardCreator");
@@ -47,46 +51,6 @@ function createAllCards(){
         }		
 	}
   apply_css_page();
-}
-
-export function print(id){
-  
-  /*var doc = new jsPDF();
-  var elementHTML = $('#print_paper').html();
-  var specialElementHandlers = {
-      '#print_work_space': function (element, renderer) {
-          return true;
-      }
-  };
-  doc.fromHTML(elementHTML, 15, 15, {
-    'width': 170,
-    'elementHandlers': specialElementHandlers
-  });
-
-
-// Save the PDF
-doc.save('sample-document.pdf');
-
-*/
-var element = document.getElementById('print_work_space');
-var worker = html2pdf().from(element).toImg().save();
-  return;
-	window.print();
-	return;
-	var element = document.getElementById(id);
-	html2pdf(element);
-	return;
-  var elem = document.getElementById(id);
-  var tab = window.open('', 'PRINT', 'height=400,width=600');
-  tab.document.write('<html><head><title>CARD PRINT</title>');
-  tab.document.write('</head><body width="7cm" height="10cm">');
-  tab.document.write(elem.innerHTML);
-  tab.document.write('</body></html>');
-  tab.document.close();
-  tab.focus();
-  tab.print();
-  tab.close();
-  return true;
 }
 
 async function apply_config(){

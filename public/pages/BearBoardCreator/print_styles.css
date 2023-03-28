@@ -7,7 +7,7 @@ body{
     overflow: hidden;
     z-index: -1000;
     padding: 1cm;
-    background-color: #f03030;
+    /*background-color: #f03030;*/
 }
 #print_work_space{
     display: inline-block;
