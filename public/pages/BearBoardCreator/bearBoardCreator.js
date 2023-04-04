@@ -29,7 +29,8 @@ async function set_header_actions(){
     $("#btn_apply").click(async ()=>{
         //console.log("CARD DATA",cardData);
         if(!CURRENT_NODE_ID){
-            deselect_node();
+            updateCard(true);
+            await saveFile(cardData,"nodesData.json");
             return;
         }
         $("#btn_apply").html('WAIT..');
@@ -86,6 +87,12 @@ async function set_header_actions(){
         cardData.cards[CURRENT_CARD_ID].amount = val;
         await saveFile(cardData,"nodesData.json");
     });  
+    $("#name_card").change(async ()=>{ 
+        if(!CURRENT_CARD_ID) return;
+        cardData.cards[CURRENT_CARD_ID].cardName = $("#name_card").val();
+        loadCardList();
+        await saveFile(cardData,"nodesData.json");
+    });
     $("#delete_card").click(async ()=>{
         $("#delete_card").html('DELETING..');
         console.log(cardData.cards[CURRENT_CARD_ID])
@@ -170,21 +177,27 @@ function updateInterface(){
         if(CURRENT_NODE_ID) $('#delete_node').removeClass("hidden");
         else $('#delete_node').addClass("hidden");
         $('#amount_card').addClass("hidden");
+        $('#name_card').addClass("hidden");
         $('#delete_card').addClass("hidden");
         $('#size_card_x').removeClass("hidden");        
-        $('#size_card_x').attr('placeholder',cardData.size_x);
+        $('#size_card_x').val(cardData.size_x);
         $('#size_card_y').removeClass("hidden");        
-        $('#size_card_y').attr('placeholder',cardData.size_y);
+        $('#size_card_y').val(cardData.size_y);
     }else{
         $("#add_node_panel").addClass("hidden");
         $('#delete_node').addClass("hidden");
-        $('#amount_card').removeClass("hidden");        
+        $('#amount_card').removeClass("hidden"); 
+        $('#name_card').removeClass("hidden");        
         $('#delete_card').removeClass("hidden");
         $('#size_card_x').addClass("hidden");
         $('#size_card_y').addClass("hidden");
     }
     $('#btn_node_id').html(CURRENT_NODE_ID); 
-    if(CURRENT_CARD_ID) $("#amount_card").val(cardData.cards[CURRENT_CARD_ID].amount);
+    if(CURRENT_CARD_ID){
+        if(cardData.cards[CURRENT_CARD_ID].amount) cardData.cards[CURRENT_CARD_ID].amount = 1;
+        $("#amount_card").val(cardData.cards[CURRENT_CARD_ID].amount);  
+        $("#name_card").val(cardData.cards[CURRENT_CARD_ID].cardName);  
+    }
 }
 
 function recalculateCardScale(){
@@ -207,7 +220,7 @@ function get_json_from_pre(idElem){
 function select_node(e){
     deselect_node();
     let id = $(e.target).attr('id');
-    if(id=="selector_node" || CURRENT_NODE_ID==id) return;
+    if(id=="selector_node" || id=="card_space" || CURRENT_NODE_ID==id) return;
     CURRENT_NODE_ID = id;     
     updateInterface();
     set_selector_node(CURRENT_NODE_ID);  

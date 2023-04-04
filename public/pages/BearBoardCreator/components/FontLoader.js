@@ -1,5 +1,7 @@
 export var FONTS = {
-    VeryYou: {family:"Very You", cdn: 'https://fonts.cdnfonts.com/css/very-you'}
+    VeryYou: {family:"Very You", cdn: 'https://fonts.cdnfonts.com/css/very-you'},
+    MedievalScribish: {family:"Very You", cdn: 'https://fonts.cdnfonts.com/css/medieval-scribish'},
+    Amagro: {family:"Very You", cdn: 'https://fonts.cdnfonts.com/css/amagro'}
 }
 
 export function loadAllFonts(){
