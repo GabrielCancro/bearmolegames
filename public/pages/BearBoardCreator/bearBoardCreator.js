@@ -194,7 +194,7 @@ function updateInterface(){
     }
     $('#btn_node_id').html(CURRENT_NODE_ID); 
     if(CURRENT_CARD_ID){
-        if(cardData.cards[CURRENT_CARD_ID].amount) cardData.cards[CURRENT_CARD_ID].amount = 1;
+        if(!cardData.cards[CURRENT_CARD_ID].amount) cardData.cards[CURRENT_CARD_ID].amount = 1;
         $("#amount_card").val(cardData.cards[CURRENT_CARD_ID].amount);  
         $("#name_card").val(cardData.cards[CURRENT_CARD_ID].cardName);  
     }
