@@ -27,8 +27,8 @@ async function loadProjectsList(){
 
     $("#btn_new_project").click( async (e)=>{
         var name = $("#inp_new_project").val();        
-        if(Object.keys(PROJECTS).length>=3){
-            main.showfloatText("No puedes tener mas de tres proyectos a la vez.");
+        if(Object.keys(PROJECTS).length>=5){
+            main.showfloatText("No puedes tener mas de cinco proyectos a la vez.");
             return;
         }
         if(name==""){
