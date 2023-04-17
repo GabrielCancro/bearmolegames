@@ -5,12 +5,16 @@ import {
 	createUserWithEmailAndPassword,
 	sendEmailVerification,
 	sendPasswordResetEmail,
+	GoogleAuthProvider,
+	signInWithPopup,
+
 } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 //import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
 
 var current_user;
 
 export function startFirebase(){
+	
 	console.log("startFirebase!");
 	/*const firebaseConfig = {
 	  apiKey: "AIzaSyCnXkA47QeESc34oyqwt4GF6i4urOuo-00",
@@ -130,4 +134,19 @@ export async function refreshUser(){
 	await auth.currentUser.reload();
 	current_user = auth.currentUser;
 	return current_user;
+}
+
+export async function loginWithGoogle(){
+	const auth = getAuth();
+	const provider = new GoogleAuthProvider();
+	provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+	let res = await signInWithPopup(auth, provider);
+	/*console.log("AUTH ",res);
+	if(res){
+		const credential = GoogleAuthProvider.credentialFromResult(res);
+		const token = credential.accessToken;
+		const user = res.user;
+		console.log("AUTH OK!")
+	}*/
+	return res;
 }

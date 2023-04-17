@@ -14,7 +14,6 @@ export async function initPage(){
     /*$("#btn_bbc").click(()=>{
     	main.changePage("bbcProjects"); 
     });*/
-    
 }
 
 async function get_user_info(){
