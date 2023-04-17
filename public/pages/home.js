@@ -11,9 +11,9 @@ export async function initPage(){
         await fireutils.logout();  
         main.changePage("login");      
     });
-    $("#btn_bbc").click(()=>{
+    /*$("#btn_bbc").click(()=>{
     	main.changePage("bbcProjects"); 
-    });
+    });*/
     
 }
 
